@@ -92,28 +92,6 @@ if(isset($_GET['code']) && !empty($_GET['code'])) {
     if(mysqli_num_rows($result) <= 0) {
         require(__DIR__ . "/templates/login.php");
     } else {
-        $row = mysqli_fetch_assoc($result);
-        $today = strtotime(date("Y-m-d"));
-        $expiry = (int)($row['expiry_date'] - (86400 * 2));
-        $token = $row["token"];
-        
-        if($today > $expiry) {
-            $new_token = $instagram->refreshToken($token, true);
-            // Exchange this token for a long lived token (valid for 60 days)
-            // Set user access token
-            $instagram->setAccessToken($new_token);
-
-            $expiry_date = strtotime(date('Y-m-d', time() + 86400 * 60));
-
-            $sqlc = "UPDATE $account_table SET `token` = '$new_token', `expiry_date` = '$expiry_date'  WHERE `token` = '$token'";
-
-            if(!$result = mysqli_query($conn, $sqlc)){
-
-                die('There was an error running the query [' . mysqli_error($conn) . ']');
-        
-            }
-        }
-
         require(__DIR__ . "/templates/sync.php");
     }
     
